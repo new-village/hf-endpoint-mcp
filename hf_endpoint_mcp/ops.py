@@ -86,6 +86,8 @@ def timer(cfg, action):
         run(["systemctl", "--user", "disable", "--now", unit])
         if run(["systemctl", "--user", "is-enabled", unit], check=False).stdout.strip() != "disabled":
             raise RuntimeError("timer is not disabled")
+        if run(["systemctl", "--user", "is-active", unit], check=False).stdout.strip() != "inactive":
+            raise RuntimeError("timer is still active")
 
 
 def switch(cfg, mode):
@@ -141,6 +143,8 @@ def start(cfg, timeout=2700):
         if (scaling.get("maxReplica") != 1 or scaling.get("minReplica", 0) != 0
                 or scaling.get("scaleToZeroTimeout") != 15):
             raise RuntimeError("endpoint must have minReplica=0, maxReplica=1, 15-minute scale-to-zero")
+        if state(ep) == "failed":
+            raise RuntimeError("endpoint is failed; investigate before separately authorized recovery")
         timer(cfg, "enable")  # fail closed: no unmonitored GPU resume
         if state(ep) != "running":
             request(tok, "POST", endpoint_url(cfg) + "/resume")
