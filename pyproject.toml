@@ -1,0 +1,17 @@
+[project]
+name = "hf-endpoint-mcp"
+version = "0.1.0"
+description = "Explicit, monitored Hugging Face Inference Endpoint management via MCP"
+requires-python = ">=3.11"
+dependencies = ["mcp>=1.10,<2"]
+
+[project.scripts]
+hf-endpoint-mcp = "hf_endpoint_mcp.server:main"
+hf-endpoint-watch = "hf_endpoint_mcp.ops:main"
+
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["hf_endpoint_mcp*"]

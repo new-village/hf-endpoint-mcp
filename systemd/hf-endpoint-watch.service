@@ -1,0 +1,7 @@
+[Unit]
+Description=Reconcile an explicitly started HF Inference Endpoint
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/hf-endpoint-mcp/runtime.env
+ExecStart=%h/.local/share/hf-endpoint-mcp/venv/bin/hf-endpoint-watch reconcile

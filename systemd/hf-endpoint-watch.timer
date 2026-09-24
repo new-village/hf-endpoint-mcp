@@ -1,0 +1,11 @@
+[Unit]
+Description=Monitor an explicitly started HF Inference Endpoint
+
+[Timer]
+OnActiveSec=5min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Unit=hf-endpoint-watch.service
+
+[Install]
+WantedBy=timers.target
