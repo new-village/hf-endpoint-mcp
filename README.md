@@ -26,6 +26,7 @@ Configure the client to execute `python -m hf_endpoint_mcp.server` with `HF_MCP_
 ## Lifecycle and rollback
 
 `start` first checks one-replica/zero-minimum scaling, enables the 5-minute timer and reads it back, resumes if needed, waits for ready, performs authenticated inference, then invokes the verified model adapter. On failure after enabling the timer, the timer stays active: investigate and pause safely. The watcher performs only a state read while running. At scaled-to-zero/paused it switches the agent to fallback, pauses and confirms the endpoint (to prevent accidental HTTP wake), then disables the timer and reads back disabled. `stop` does the same ordering intentionally. There is no forced session duration cap; endpoint-side billing limits remain the operator's responsibility.
+An endpoint already in `failed` state is **not** resumed by `start`; diagnose it and obtain separate approval for any recovery or redeployment. Timer disable requires both `is-enabled=disabled` and `is-active=inactive` readbacks.
 
 To roll back: ensure the agent adapter selects `sol` and verifies readback; pause and confirm HF state through its management API; only then disable the timer. Remove the MCP client entry and units, reload systemd, and uninstall the package. **Do not disable an active timer until the endpoint is confirmed paused**. If the endpoint or adapter is unavailable, preserve the timer and configuration for recovery. Model changes in an existing conversation may require a new agent session depending on client behavior.
 
